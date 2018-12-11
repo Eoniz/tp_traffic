@@ -101,19 +101,24 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		stage.show();
 		
 		int[] tick = {0};
-		Timeline cycle = new Timeline(new KeyFrame(Duration.millis(tempo),
-				event -> {
-					moveCars();
-					if(tick[0]++ % 3 == 0) {
-						for(int i = 0; i < 2; i++) {
-							Car car = trafficManager.addCar();
-							if(car != null)
-								renderCar(root, car);
-						}
-					}
+		Timeline startCycle = new Timeline(new KeyFrame(Duration.millis(5000),
+				e -> {
+					Timeline cycle = new Timeline(new KeyFrame(Duration.millis(tempo),
+							event -> {
+								moveCars();
+								if(tick[0]++ % 3 == 0) {
+									for(int i = 0; i < 2; i++) {
+										Car car = trafficManager.addCar();
+										if(car != null)
+											renderCar(root, car);
+									}
+								}
+							}));
+					cycle.setCycleCount(Timeline.INDEFINITE);
+					cycle.play();
 				}));
-		cycle.setCycleCount(Timeline.INDEFINITE);
-		cycle.play();
+		startCycle.setCycleCount(1);
+		startCycle.play();
 	}
 	
 	/**
@@ -163,7 +168,6 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 	 * @param car : the car to be render
 	 */
 	private void renderCar(Group root, Car car) {
-		System.out.println("rendering car " + car.getId());
 		double cx = offset + car.getX() * width / Grid.WIDTH;
 		double cy = offset + car.getY() * height / Grid.HEIGHT;
 		
