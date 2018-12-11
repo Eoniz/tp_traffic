@@ -6,10 +6,24 @@ import java.util.Random;
 import fr.univ_valennciennes.poo.grid.Grid;
 
 public class TrafficManager {
+	/**
+	 * The cars
+	 */
 	private ArrayList<Car> cars;
+	
+	/**
+	 * Random number generator
+	 */
 	private Random random;
+	
+	/**
+	 * The current grid of nodes
+	 */
 	private Grid grid;
 	
+	/**
+	 * Allows us to give a unique id for each cars
+	 */
 	private static int CAR_ID = 0;
 	
 	
@@ -18,11 +32,12 @@ public class TrafficManager {
 		random = new Random();
 		
 		this.grid = grid;
-		
-		addCar();
-		addCar();
 	}
 	
+	/**
+	 * Add a car in the traffic
+	 * @return <b>Car</b> : the added car
+	 */
 	public Car addCar() {
 		Car car = null;
 		boolean isHorizontal = random.nextBoolean();
@@ -46,12 +61,21 @@ public class TrafficManager {
 		return car;
 	}
 	
+	/**
+	 * Removes a car from the traffic
+	 * @param car : the car to del
+	 */
 	public void removeCar(Car car) {
 		if(car.getCurrentNode() != null)
 			car.getCurrentNode().removeCar(car);
 		cars.remove(car);
 	}
-
+	
+	/**
+	 * Finds a car by id
+	 * @param id : the car's id
+	 * @return <b>Car</b> : the car if found, <b>null</b> otherwise
+	 */
 	public Car findCarById(int id) {
 		for(Car car : cars) {
 			if(car.getId() == id)
@@ -61,37 +85,22 @@ public class TrafficManager {
 		return null;
 	}
 	
+	/** GETTERS */
+	
 	public ArrayList<Car> getCars() {
 		return cars;
-	}
-
-	public void setCars(ArrayList<Car> cars) {
-		this.cars = cars;
 	}
 
 	public Random getRandom() {
 		return random;
 	}
 
-	public void setRandom(Random random) {
-		this.random = random;
-	}
-
 	public Grid getGrid() {
 		return grid;
 	}
 
-	public void setGrid(Grid grid) {
-		this.grid = grid;
-	}
-
 	public static int getCAR_ID() {
 		return CAR_ID;
-	}
-
-	public static void setCAR_ID(int cAR_ID) {
-		CAR_ID = cAR_ID;
-	}
-	
+	}	
 	
 }

@@ -27,14 +27,38 @@ import javafx.util.Duration;
 
 public class Main extends Application implements EventHandler<MouseEvent> {
 	
+	/**
+	 * The offset
+	 */
 	private static final double offset = 100d;
+	
+	/**
+	 * The window's width
+	 */
 	private static final double width = 500d;
+	
+	/**
+	 * The window's height
+	 */
 	private static final double height = 400d;
+	
+	/**
+	 * The delay (tempo)
+	 */
 	private static final int tempo = 500;
 	
+	/**
+	 * The grid
+	 */
 	private Grid grid;
+	/**
+	 * The traffic manager
+	 */
 	private TrafficManager trafficManager;
 	
+	/**
+	 * The cars renderer
+	 */
 	private ArrayList<CarRendering> carsRendering;
 	
 	@Override
@@ -61,6 +85,10 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		render(primaryStage);
 	}
 	
+	/**
+	 * Method for creating the stage, init the tick cycle & render the roads & the cars
+	 * @param stage : the stage
+	 */
 	private void render(Stage stage) {
 		Group root = new Group();
 		Scene scene = new Scene(root, 2*offset + width, 2*offset + height, Color.ANTIQUEWHITE);
@@ -88,6 +116,10 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		cycle.play();
 	}
 	
+	/**
+	 * Method for rendering the roads
+	 * @param root : the root
+	 */
 	private void renderGame(Group root) {
 		List<Node> nodes = grid.getNodes();
 		
@@ -125,6 +157,11 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		}
 	}
 	
+	/**
+	 * Method for rendering a car
+	 * @param root : the root
+	 * @param car : the car to be render
+	 */
 	private void renderCar(Group root, Car car) {
 		System.out.println("rendering car " + car.getId());
 		double cx = offset + car.getX() * width / Grid.WIDTH;
@@ -145,6 +182,9 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		carsRendering.add(cr);
 	}
 	
+	/**
+	 * Method for moving cars
+	 */
 	private void moveCars() {
 		List<Car> cars = trafficManager.getCars();
 		List<Car> carsToDel = new ArrayList<>();
@@ -153,8 +193,10 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 			Car car = cars.get(i);
 			CarRendering cr = carsRendering.get(i);
 			
-			car.checkIfStucked();
+			// Check if the car is stuck (accident in front)
+			car.checkIfStucked(); 
 			
+			// If the car can move
 			if(!car.isArrived() && !car.isPaused() && !car.isStuck() && !car.isCrashed()) {
 				Node next = car.getNextNode();
 				if(next != null) {
@@ -172,22 +214,23 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 						
 						cr.setAnimation(timeline);
 					}
-				} else {
+				} else { // If no next node
 					carsToDel.add(car);
 				}
-			} else {
-				if(car.isArrived())
+			} else { // If is arrived or crashed or stucked or paused
+				if(car.isArrived()) // If arrived, remove it
 					carsToDel.add(car);
 				
-				if(car.isCrashed()) {
+				if(car.isCrashed()) { // If crashed, update the rendering & update the car's timer
 					getCarRendering(car.getId()).crashed();
-					if(car.updateTime()) {
+					if(car.updateTime()) { // If the car's timer is ok, remove the car
 						carsToDel.add(car);
 					}
 				}
 			}
 		}
 		
+		// Remove each car to be deleted
 		for(Car car : carsToDel) {
 			CarRendering cr = getCarRendering(car.getId());
 			cr.setVisible(false);
@@ -197,6 +240,11 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		}
 	}
 	
+	/**
+	 * Method for getting the CarRendering via the car's id
+	 * @param id : the car's id
+	 * @return <b>CarRendering</b> : the car's CarRendering
+	 */
 	private CarRendering getCarRendering(int id) {
 		CarRendering cr = null;
 		Optional<CarRendering> opt = carsRendering.stream().filter(car -> car.getNo() == id).findFirst();

@@ -7,22 +7,56 @@ import fr.univ_valennciennes.poo.grid.Node;
 
 public class Car {
 	
+	/**
+	 * The car's id
+	 */
 	private int id;
-	private double x, y;
+	/**
+	 * The car's x position
+	 */
+	private double x;
+	/**
+	 * The car's y position
+	 */
+	private double y;
 	
+	/**
+	 * The path
+	 */
 	private ArrayList<Node> path;
+	/**
+	 * The remaining path
+	 */
 	private ArrayList<Node> remainingPath;
 	
-	private Node origin, destination, currentNode;
+	/**
+	 * The car's origin
+	 */
+	private Node origin;
+	/**
+	 * The car's destination
+	 */
+	private Node destination;
+	/**
+	 * The car's current node
+	 */
+	private Node currentNode;
 	
 	private boolean 
-		paused,
-		arrived,
-		stuck,
-		isHorizontal,
-		crashed;
+		paused, // Is it paused ?
+		arrived, // Is it arrived ?
+		stuck, // Is it stucked ?
+		isHorizontal, // Is it going horizontally ?
+		crashed; // Is it crashed ?
 	
+	/**
+	 * The delay before removing the car of the node
+	 */
 	private static final int DELAY = 10;
+	
+	/**
+	 * The remaining time before removing the car of the node
+	 */
 	private int remainingTime = 0;
 	
 	public Car(int id, Node origin, Node destination) {
@@ -44,6 +78,9 @@ public class Car {
 		this.pathFinder();
 	}
 	
+	/**
+	 * Method for generating the path
+	 */
 	public void pathFinder() {
 		this.isHorizontal = (this.origin.getY() == this.destination.getY());
 		Node next = origin;
@@ -70,6 +107,10 @@ public class Car {
 		}
 	}
 	
+	/**
+	 * Returns the next node from the path
+	 * @return <b>Node</b> : the next node
+	 */
 	public Node getNextNode() {
 		if(currentNode != null)
 			currentNode.removeCar(this);
@@ -86,6 +127,10 @@ public class Car {
 		return null;
 	}
 	
+	/**
+	 * Returns true if the car's stucked
+	 * @return <b>boolean</b> : is the car stucked ?
+	 */
 	public boolean checkIfStucked() {
 		if(remainingPath.isEmpty())
 			return false;
@@ -105,10 +150,18 @@ public class Car {
 		return stucked;
 	}
 	
+	/**
+	 * Method for updating the remaining time if the car's crashed
+	 * @return <b>boolean</b> : true when the remaining time is >= DELAY
+	 */
 	public boolean updateTime() {
+		if(!crashed) return false;
+		
 		return (remainingTime++) >= DELAY;
 	}
 	
+	
+	/** GETTERS & SETTERS */
 	public void crashed() {
 		this.crashed = true;
 	}
@@ -120,55 +173,33 @@ public class Car {
 	public void setId(int id) {
 		this.id = id;
 	}
-
+	
 	public double getX() {
 		return x;
 	}
-
-	public void setX(double x) {
-		this.x = x;
-	}
-
+	
 	public double getY() {
 		return y;
 	}
 
-	public void setY(double y) {
-		this.y = y;
-	}
 
 	public ArrayList<Node> getPath() {
 		return path;
 	}
 
-	public void setPath(ArrayList<Node> path) {
-		this.path = path;
-	}
 
 	public ArrayList<Node> getRemainingPath() {
 		return remainingPath;
-	}
-
-	public void setRemainingPath(ArrayList<Node> remainingPath) {
-		this.remainingPath = remainingPath;
 	}
 
 	public Node getOrigin() {
 		return origin;
 	}
 
-	public void setOrigin(Node origin) {
-		this.origin = origin;
-	}
-
 	public Node getDestination() {
 		return destination;
 	}
-
-	public void setDestination(Node destination) {
-		this.destination = destination;
-	}
-
+	
 	public Node getCurrentNode() {
 		return currentNode;
 	}
