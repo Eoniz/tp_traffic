@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class Grid {
 	
+	public static final Grid INSTANCE = new Grid();
+	
 	/**
 	 * The list of nodes
 	 */
@@ -27,12 +29,16 @@ public class Grid {
 	 * @param destination : the destination node
 	 * @return <b>Arc</b> the created arc
 	 */
-	private Arc addArc(Node origin, Node destination) {
+	public Arc addArc(Node origin, Node destination) {
 		Arc a = new Arc(origin, destination);
 		origin.addOutputArc(a);
 		destination.addInputArc(a);
 		
 		return a;
+	}
+	
+	public Arc addArc(Node origin, Node destination, int nbSubnodes) {
+		return new Arc(origin, destination, nbSubnodes);
 	}
 	
 	/**
@@ -72,13 +78,13 @@ public class Grid {
 					Node destination = getNode(i + 1, j);
 					if(destination == null) continue;
 					
-					addArc(origin, destination);
+					addArc(origin, destination, 3);
 				}
 				if(i != 0 && i != 5) {
 					Node destination = getNode(i, j - 1);
 					if(destination == null) continue;
 					
-					addArc(origin, destination);
+					addArc(origin, destination, 3);
 				}
 			}
 		}

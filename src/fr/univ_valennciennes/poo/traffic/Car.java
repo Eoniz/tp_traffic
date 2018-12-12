@@ -47,7 +47,8 @@ public class Car {
 		arrived, // Is it arrived ?
 		stuck, // Is it stucked ?
 		isHorizontal, // Is it going horizontally ?
-		crashed; // Is it crashed ?
+		crashed, // Is it crashed ?
+		dirty; // Needs to be del
 	
 	/**
 	 * The delay before removing the car of the node
@@ -73,7 +74,7 @@ public class Car {
 		this.path = new ArrayList<>();
 		this.remainingPath = new ArrayList<>();
 		
-		this.paused = this.arrived = this.stuck = this.crashed = false;
+		this.paused = this.arrived = this.stuck = this.crashed = this.dirty = false;
 		
 		this.pathFinder();
 	}
@@ -139,7 +140,7 @@ public class Car {
 		boolean stucked = false;
 
 		for(Car car : next.getCars()) {
-			if(car.isHorizontal == this.isHorizontal) {
+			if(car.isHorizontal == this.isHorizontal || car.isCrashed()) {
 				stucked = true;
 				break;
 			}
@@ -166,6 +167,10 @@ public class Car {
 		this.crashed = true;
 	}
 
+	public void remove() {
+		this.dirty = true;
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -254,6 +259,10 @@ public class Car {
 
 	public boolean isCrashed() {
 		return crashed;
+	}
+	
+	public boolean isDirty() {
+		return dirty;
 	}
 
 	public void setCrashed(boolean crashed) {

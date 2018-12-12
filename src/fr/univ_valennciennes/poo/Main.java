@@ -22,6 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -48,15 +49,6 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 	private static final int tempo = 500;
 	
 	/**
-	 * The grid
-	 */
-	private Grid grid;
-	/**
-	 * The traffic manager
-	 */
-	private TrafficManager trafficManager;
-	
-	/**
 	 * The cars renderer
 	 */
 	private ArrayList<CarRendering> carsRendering;
@@ -66,7 +58,7 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		Object o = arg0.getSource();
 		if(o instanceof CarRendering) {
 			CarRendering cr = (CarRendering) o;
-			Car car = trafficManager.findCarById(cr.getNo());
+			Car car = TrafficManager.INSTANCE.findCarById(cr.getNo());
 			if(car != null) {
 				boolean b = car.isPaused();
 				car.setPaused(!b);
@@ -77,9 +69,7 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		grid = new Grid();
-		grid.createRoads();
-		trafficManager = new TrafficManager(grid);
+		Grid.INSTANCE.createRoads();
 		carsRendering = new ArrayList<>();
 		
 		render(primaryStage);
@@ -108,7 +98,7 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 								moveCars();
 								if(tick[0]++ % 3 == 0) {
 									for(int i = 0; i < 2; i++) {
-										Car car = trafficManager.addCar();
+										Car car = TrafficManager.INSTANCE.addCar();
 										if(car != null)
 											renderCar(root, car);
 									}
@@ -126,19 +116,28 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 	 * @param root : the root
 	 */
 	private void renderGame(Group root) {
-		List<Node> nodes = grid.getNodes();
+		List<Node> nodes = Grid.INSTANCE.getNodes();
 		
 		double radius = 1 * (50d / 3);
 		for(Node node : nodes) {
 			double cx = offset + node.getX() * width / Grid.WIDTH;
 			double cy = offset + node.getY() * height / Grid.HEIGHT;
 			
-			Circle c = new Circle(cx, cy, radius);
-			c.setFill(Color.BLACK);
-			c.setOpacity(0.2);
-			
-			root.getChildren().add(c);
-			c.setSmooth(true);
+			if(node.isSubnode()) {
+				Circle c = new Circle(cx, cy, radius / 2f);
+				c.setFill(Color.YELLOW);
+				c.setOpacity(0.8);
+				
+				root.getChildren().add(c);
+				c.setSmooth(true);
+			} else {
+				Circle c = new Circle(cx, cy, radius);
+				c.setFill(Color.BLACK);
+				c.setOpacity(0.2);
+				
+				root.getChildren().add(c);
+				c.setSmooth(true);
+			}
 		}
 		
 		for(Node node : nodes) {
@@ -156,7 +155,7 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 			}
 		}
 		
-		List<Car> cars = trafficManager.getCars();
+		List<Car> cars = TrafficManager.INSTANCE.getCars();
 		for(Car car : cars) {
 			renderCar(root, car);
 		}
@@ -171,7 +170,7 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 		double cx = offset + car.getX() * width / Grid.WIDTH;
 		double cy = offset + car.getY() * height / Grid.HEIGHT;
 		
-		CarRendering cr = new CarRendering(cx, cy, 0.1*width / grid.WIDTH, car.getId());
+		CarRendering cr = new CarRendering(cx, cy, 0.1*width / Grid.WIDTH, car.getId());
 		root.getChildren().add(cr);
 		cr.setSmooth(true);
 		cr.setOnMouseClicked(this);
@@ -190,7 +189,7 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 	 * Method for moving cars
 	 */
 	private void moveCars() {
-		List<Car> cars = trafficManager.getCars();
+		List<Car> cars = TrafficManager.INSTANCE.getCars();
 		List<Car> carsToDel = new ArrayList<>();
 		
 		for(int i = 0; i < cars.size(); i++) {
@@ -225,6 +224,9 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 				if(car.isArrived()) // If arrived, remove it
 					carsToDel.add(car);
 				
+				if(car.isDirty())
+					carsToDel.add(car);
+				
 				if(car.isCrashed()) { // If crashed, update the rendering & update the car's timer
 					getCarRendering(car.getId()).crashed();
 					if(car.updateTime()) { // If the car's timer is ok, remove the car
@@ -240,7 +242,7 @@ public class Main extends Application implements EventHandler<MouseEvent> {
 			cr.setVisible(false);
 			
 			carsRendering.remove(cr);
-			trafficManager.removeCar(car);
+			TrafficManager.INSTANCE.removeCar(car);
 		}
 	}
 	

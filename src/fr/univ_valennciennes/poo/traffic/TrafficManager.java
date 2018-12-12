@@ -6,6 +6,9 @@ import java.util.Random;
 import fr.univ_valennciennes.poo.grid.Grid;
 
 public class TrafficManager {
+	
+	public static final TrafficManager INSTANCE = new TrafficManager(Grid.INSTANCE);
+	
 	/**
 	 * The cars
 	 */

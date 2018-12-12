@@ -3,6 +3,7 @@ package fr.univ_valennciennes.poo.grid;
 import java.util.ArrayList;
 
 import fr.univ_valennciennes.poo.traffic.Car;
+import fr.univ_valennciennes.poo.traffic.TrafficManager;
 
 public class Node {
 	
@@ -29,9 +30,19 @@ public class Node {
 	 */
 	private ArrayList<Car> cars;
 	
-	public Node(int x, int y) {
+	/**
+	 * Is the node a subnode
+	 */
+	private boolean subnode;
+	
+	public Node(double x, double y) {
+		this(x, y, false);
+	}
+	
+	public Node(double x, double y, boolean subnode) {
 		this.x = x;
 		this. y = y;
+		this.subnode = subnode;
 		
 		this.inputs = new ArrayList<>();
 		this.outputs = new ArrayList<>();
@@ -46,15 +57,23 @@ public class Node {
 	public Car addCar(Car car) {
 		this.cars.add(car);
 		
+		ArrayList<Car> carsCrashed = new ArrayList<>();
 		if(this.cars.size() > 1) {
-			for(Car c : cars) {
-				for(Car cc : cars) {
-					if(c.isHorizontal() != cc.isHorizontal()) {
-						c.crashed();
-						cc.crashed();
+			for(int i = 0; i < cars.size(); i++) {
+				for(int j = 0; j < cars.size(); j++) {
+					if(cars.get(i).isHorizontal() != cars.get(j).isHorizontal()) {
+						if(carsCrashed.contains(cars.get(i)) == false)
+							carsCrashed.add(cars.get(i));
+						
+						if(carsCrashed.contains(cars.get(j)) == false)
+							carsCrashed.add(cars.get(j));
 					}
 				}
 			}
+		}
+		
+		for(Car c : carsCrashed) {
+			c.crashed();
 		}
 		
 		return car;
@@ -95,6 +114,13 @@ public class Node {
 	 * @return <b>double</b> : the y position
 	 */
 	public double getY() { return (double) y; }
+	
+	
+	/**
+	 * Is the node principal or a subnode ?
+	 * @return <b>boolean</b> : is the node a subnode ?
+	 */
+	public boolean isSubnode() { return subnode; }
 	
 	/**
 	 * Returns the inputs arcs
